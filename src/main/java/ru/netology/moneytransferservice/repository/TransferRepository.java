@@ -13,12 +13,12 @@ public class TransferRepository {
     private static int count = 1;
 
     public TransferRepository() {
+
     }
 
-    public String getOperationId (Transfer transfer){
-        String operationId = String.valueOf(count++);
-        repository.put(operationId, transfer);
-        System.out.println("OperationID: " + operationId);
-        return operationId;
+    public String getOperationId(Transfer transfer) {
+        String operationID = String.valueOf(count++);
+        repository.put(operationID,transfer);
+        return operationID;
     }
 }
