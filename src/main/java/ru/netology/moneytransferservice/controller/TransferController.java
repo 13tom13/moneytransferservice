@@ -1,6 +1,8 @@
 package ru.netology.moneytransferservice.controller;
 
 
+
+import javax.validation.Valid;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +23,7 @@ public class TransferController {
     }
 
     @PostMapping("/transfer")
-    public OperationId transfer(@RequestBody Transfer transfer) {
+    public OperationId transfer(@RequestBody @Valid Transfer transfer) {
         return transferServer.transfer(transfer);
     }
 
