@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class TransferLog {
 
-    @Value("${log.file.name: src/main/resources/log/transfer.log}")
+    @Value("${log.file.name}")
     private String filename;
 
     public void transferLog(Transfer transfer) {
@@ -32,7 +32,7 @@ public class TransferLog {
     }
 
     public void transferResultLog(ConfirmOperation confirmOperation) {
-        try (FileWriter writer = new FileWriter("src/main/resources/log/transfer.log", true)) {
+        try (FileWriter writer = new FileWriter(filename, true)) {
             String result = String.format("[RESULT] success | (OperationID: %s)\n", confirmOperation.operationId());
             writer.write(result);
             System.out.print(result);
