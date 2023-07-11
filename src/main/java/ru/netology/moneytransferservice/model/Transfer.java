@@ -1,20 +1,20 @@
 package ru.netology.moneytransferservice.model;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public record Transfer (
 
-        @Pattern(regexp = "^{16}$")
+        @Size(min = 16)
         @NotBlank
         String cardToNumber,
-        @Pattern(regexp = "^{3}$")
+        @Size(min = 4)
         @NotBlank
         String cardFromValidTill,
-        @Pattern(regexp = "^{16}$")
+        @Size(min = 16)
         @NotBlank
         String cardFromNumber,
-        @Pattern(regexp = "^{3}$")
+        @Size(min = 3)
         @NotBlank
         String cardFromCVV,
         Amount amount

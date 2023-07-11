@@ -43,8 +43,8 @@ class MoneytransferserviceApplicationTests {
         Mockito.when(confirmOperation.operationId()).thenReturn(testIDRequest);
 
         // when:
-        ErrorConfirmation testConfirmationException =
-                Assertions.assertThrows(ErrorConfirmation.class, () -> transferController.confirmOperation(confirmOperation));
+        ErrorConfirmation testConfirmationException = Assertions.assertThrows(ErrorConfirmation.class,
+                () -> transferController.confirmOperation(confirmOperation));
         // then:
         Assertions.assertEquals("The transaction has not been approved", testConfirmationException.getMessage());
     }

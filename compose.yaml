@@ -1,8 +1,15 @@
 version: "3"
 
 services:
-  app:
-    build: ./
-    container_name: 'app'
+  app1:
+    image: 'moneytransferservice:latest'
+    container_name: 'moneytransferservice'
     ports:
       - '5500:5500'
+  app2:
+    image: 'card-transfer:latest'
+    container_name: 'card-transfer'
+    ports:
+      - '3000:3000'
+    depends_on:
+      - app1

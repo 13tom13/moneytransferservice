@@ -25,13 +25,13 @@ public class TransferRepository {
         return iDFromRep;
     }
 
-    public String confirmOperation(ConfirmOperation confirmOperation) {
+    public OperationId confirmOperation(ConfirmOperation confirmOperation) {
         String iDForConfirm = confirmOperation.operationId();
         String codeFromRep = repository.remove(iDForConfirm);
         if (confirmOperation.code().equals(codeFromRep)) {
-            return iDForConfirm;
+            return new OperationId(iDForConfirm);
         } else {
-            return null;
+            return new OperationId("denied");
         }
     }
 

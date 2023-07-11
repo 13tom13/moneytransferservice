@@ -18,7 +18,6 @@ public class TransferServer {
 
     private final TransferLog transferLog;
 
-
     public TransferServer(TransferRepository transferRepository, TransferLog transferLog) {
         this.transferRepository = transferRepository;
         this.transferLog = transferLog;
@@ -28,24 +27,24 @@ public class TransferServer {
         transferLog.transferLog(transfer);
         if (transfer.cardFromNumber().startsWith("4")) {
             throw new ErrorInputData(
-                    "i'm don't like this card number: " + transfer.cardFromNumber() + " starts with \"4\"");
+                    "i'm don't like this card number: " + transfer.cardFromNumber() + " starts with \"4\"", transferLog);
         }
         if (transfer.amount().value() > 100000) {
-            throw new ErrorTransfer("value is so big (biggest then 1000)");
+            throw new ErrorTransfer("value is so big (biggest then 1000)", transferLog);
         }
         return transferRepository.getOperationId(transfer);
     }
 
     public OperationId confirmOperation(ConfirmOperation confirmOperation) {
-        if (confirmOperation.code() == null || confirmOperation.code().length() > 4){
-            throw new ErrorInputData("code not received");
+        if (confirmOperation.code() == null || confirmOperation.code().length() > 4) {
+            throw new ErrorInputData("code not received", transferLog);
         }
-        OperationId verifiedID = new OperationId(transferRepository.confirmOperation(confirmOperation));
-        if (verifiedID.operationId() != null){
+        OperationId confirmId = transferRepository.confirmOperation(confirmOperation);
+        if (!confirmId.operationId().equals("denied")) {
             transferLog.transferResultLog(confirmOperation);
-            return verifiedID;
+            return confirmId;
         } else {
-            throw new ErrorConfirmation("The transaction has not been approved");
+            throw new ErrorConfirmation("The transaction has not been approved", transferLog);
         }
     }
 }
