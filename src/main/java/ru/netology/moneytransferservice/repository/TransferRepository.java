@@ -2,37 +2,37 @@ package ru.netology.moneytransferservice.repository;
 
 import org.springframework.stereotype.Component;
 import ru.netology.moneytransferservice.model.ConfirmOperation;
+import ru.netology.moneytransferservice.model.OperationId;
 import ru.netology.moneytransferservice.model.Transfer;
 
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class TransferRepository {
 
-    private final ConcurrentHashMap<String, Transfer> repository = new ConcurrentHashMap<>();
-
-    private static final AtomicInteger count = new AtomicInteger(1);
+    private final ConcurrentHashMap<String, String> repository = new ConcurrentHashMap<>();
 
     public TransferRepository() {
 
     }
 
-    public String getOperationId(Transfer transfer) {
-        String operationID = String.valueOf(count.getAndIncrement());
-        repository.put(operationID, transfer);
-        return operationID;
+    public OperationId getOperationId(Transfer transfer) {
+        String operationId = String.valueOf(UUID.randomUUID());
+        OperationId iDFromRep = new OperationId(operationId);
+        String code = "0000"; //code stub
+        repository.put(operationId, code);
+        return iDFromRep;
     }
 
     public String confirmOperation(ConfirmOperation confirmOperation) {
-        // здесь можно добавить обработку поддтверждения операции
-        // по operationID, но запрос с сервера всегда operationID = null
-        if (confirmOperation.operationId() == null){
-            return String.valueOf(count.get());
+        String iDForConfirm = confirmOperation.operationId();
+        String codeFromRep = repository.remove(iDForConfirm);
+        if (confirmOperation.code().equals(codeFromRep)) {
+            return iDForConfirm;
         } else {
             return null;
         }
-
     }
 
 

@@ -1,5 +1,7 @@
 package ru.netology.moneytransferservice.model;
 
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.FileWriter;
@@ -10,8 +12,11 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class TransferLog {
 
+    @Value("${log.file.name: src/main/resources/log/transfer.log}")
+    private String filename;
+
     public void transferLog(Transfer transfer) {
-        try (FileWriter writer = new FileWriter("src/main/resources/log/transfer.log", true)) {
+        try (FileWriter writer = new FileWriter(filename, true)) {
             double value = (double) transfer.amount().value() / 100;
             double commission = value / 100;
             String transferTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss"));
