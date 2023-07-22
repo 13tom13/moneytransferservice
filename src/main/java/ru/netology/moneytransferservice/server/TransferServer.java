@@ -1,7 +1,8 @@
 package ru.netology.moneytransferservice.server;
 
 
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.netology.moneytransferservice.exceptions.ErrorConfirmation;
 import ru.netology.moneytransferservice.exceptions.ErrorInputData;
 import ru.netology.moneytransferservice.exceptions.ErrorTransfer;
@@ -11,17 +12,13 @@ import ru.netology.moneytransferservice.model.Transfer;
 import ru.netology.moneytransferservice.model.TransferLog;
 import ru.netology.moneytransferservice.repository.TransferRepository;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class TransferServer {
 
     private final TransferRepository transferRepository;
 
     private final TransferLog transferLog;
-
-    public TransferServer(TransferRepository transferRepository, TransferLog transferLog) {
-        this.transferRepository = transferRepository;
-        this.transferLog = transferLog;
-    }
 
     public OperationId transfer(Transfer transfer) {
         transferLog.transferLog(transfer);

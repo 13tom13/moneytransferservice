@@ -1,5 +1,6 @@
 package ru.netology.moneytransferservice.repository;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.netology.moneytransferservice.model.ConfirmOperation;
 import ru.netology.moneytransferservice.model.OperationId;
@@ -9,13 +10,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@RequiredArgsConstructor
 public class TransferRepository {
 
     private final ConcurrentHashMap<String, String> repository = new ConcurrentHashMap<>();
-
-    public TransferRepository() {
-
-    }
 
     public OperationId getOperationId(Transfer transfer) {
         String operationId = String.valueOf(UUID.randomUUID());
