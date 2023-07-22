@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.netology.moneytransferservice.model.ConfirmOperation;
 import ru.netology.moneytransferservice.model.Transfer;
-import ru.netology.moneytransferservice.server.TransferServer;
+import ru.netology.moneytransferservice.service.TransferService;
 
 import javax.validation.Valid;
 
@@ -18,7 +18,7 @@ import javax.validation.Valid;
 public class TransferController {
 
 
-    private final TransferServer transferServer;
+    private final TransferService transferServer;
 
 
     @PostMapping("/transfer")

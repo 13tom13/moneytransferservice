@@ -1,4 +1,4 @@
-package ru.netology.moneytransferservice.server;
+package ru.netology.moneytransferservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import ru.netology.moneytransferservice.repository.TransferRepository;
 
 @Service
 @RequiredArgsConstructor
-public class TransferServer {
+public class TransferService {
 
     private final TransferRepository transferRepository;
 
