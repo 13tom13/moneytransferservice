@@ -2,8 +2,8 @@ package ru.netology.moneytransferservice.logger;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.netology.moneytransferservice.model.ConfirmOperation;
-import ru.netology.moneytransferservice.model.Transfer;
+import ru.netology.moneytransferservice.model.ConfirmData;
+import ru.netology.moneytransferservice.model.TransferData;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class TransferLog {
         }
     }
 
-    public void transferLog(Transfer transfer) {
+    public void transferLog(TransferData transfer) {
         double value = (double) transfer.amount().value() / 100;
         double commission = value / 100;
         String transferForWrite =
@@ -42,7 +42,7 @@ public class TransferLog {
         logEntry(error);
     }
 
-    public synchronized void transferResultLog(ConfirmOperation confirmOperation) {
+    public synchronized void transferResultLog(ConfirmData confirmOperation) {
         String result = String.format("[RESULT] %s | success | (OperationID: %s)\n", transferTime, confirmOperation.operationId());
         logEntry(result);
     }

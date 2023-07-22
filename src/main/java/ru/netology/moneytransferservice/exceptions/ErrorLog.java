@@ -2,7 +2,7 @@ package ru.netology.moneytransferservice.exceptions;
 
 import ru.netology.moneytransferservice.logger.TransferLog;
 
-public class ErrorLog extends RuntimeException {
+public abstract class ErrorLog extends RuntimeException {
 
     public ErrorLog(String msg, TransferLog log) {
         super(msg);

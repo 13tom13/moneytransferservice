@@ -3,7 +3,7 @@ package ru.netology.moneytransferservice.model;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record Transfer (
+public record TransferData(
 
         @Size(min = 16)
         @NotBlank

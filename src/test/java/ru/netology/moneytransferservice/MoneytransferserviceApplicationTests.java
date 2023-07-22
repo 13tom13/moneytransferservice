@@ -12,24 +12,24 @@ import org.springframework.http.ResponseEntity;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.netology.moneytransferservice.controller.TransferController;
+import ru.netology.moneytransferservice.controller.MoneyTransferController;
 import ru.netology.moneytransferservice.exceptions.ErrorConfirmation;
 import ru.netology.moneytransferservice.model.Amount;
-import ru.netology.moneytransferservice.model.ConfirmOperation;
+import ru.netology.moneytransferservice.model.ConfirmData;
 import ru.netology.moneytransferservice.model.OperationId;
-import ru.netology.moneytransferservice.model.Transfer;
+import ru.netology.moneytransferservice.model.TransferData;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MoneytransferserviceApplicationTests {
 
     @Autowired
-    private TransferController transferController;
+    private MoneyTransferController transferControllerImpl;
 
     @Autowired
     TestRestTemplate restTemplate;
 
-    static Transfer transferTest;
+    static TransferData transferTest;
 
     @Container
     private static final GenericContainer<?> moneytransferservice = new GenericContainer<>("moneytransferservice:latest")
@@ -37,7 +37,7 @@ class MoneytransferserviceApplicationTests {
 
     @BeforeEach
     public void setUp() {
-        transferTest = Mockito.mock(Transfer.class);
+        transferTest = Mockito.mock(TransferData.class);
         Amount amountTest = Mockito.mock(Amount.class);
         Mockito.when(amountTest.value()).thenReturn(100);
         Mockito.when(amountTest.currency()).thenReturn("RUR");
@@ -68,7 +68,7 @@ class MoneytransferserviceApplicationTests {
 
     @Test
     void transferControllerTest() {
-        ResponseEntity<String> testID = transferController.transfer(transferTest);
+        ResponseEntity<String> testID = transferControllerImpl.transfer(transferTest);
         // then:
         Assertions.assertNotNull(testID);
     }
@@ -78,12 +78,12 @@ class MoneytransferserviceApplicationTests {
         // given:
         String testIDRequest = "1234";
         String testCode = "0000";
-        ConfirmOperation confirmOperation = Mockito.mock(ConfirmOperation.class);
+        ConfirmData confirmOperation = Mockito.mock(ConfirmData.class);
         Mockito.when(confirmOperation.code()).thenReturn(testCode);
         Mockito.when(confirmOperation.operationId()).thenReturn(testIDRequest);
         // when:
         ErrorConfirmation testConfirmationException = Assertions.assertThrows(ErrorConfirmation.class,
-                () -> transferController.confirmOperation(confirmOperation));
+                () -> transferControllerImpl.confirmOperation(confirmOperation));
         // then:
         Assertions.assertEquals("The transaction has not been approved",
                 testConfirmationException.getMessage());
