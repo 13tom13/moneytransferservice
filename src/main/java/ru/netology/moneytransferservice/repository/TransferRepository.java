@@ -16,7 +16,7 @@ public class TransferRepository {
     private final ConcurrentHashMap<String, String> repository = new ConcurrentHashMap<>();
 
     public OperationId getOperationId(Transfer transfer) {
-        String operationId = String.valueOf(UUID.randomUUID());
+        String operationId = String.valueOf(UUID.nameUUIDFromBytes(transfer.toString().getBytes()));
         OperationId iDFromRep = new OperationId(operationId);
         String code = "0000"; //code stub
         repository.put(operationId, code);

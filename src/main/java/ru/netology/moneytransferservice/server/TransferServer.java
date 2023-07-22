@@ -1,7 +1,8 @@
 package ru.netology.moneytransferservice.server;
 
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.netology.moneytransferservice.exceptions.ErrorConfirmation;
 import ru.netology.moneytransferservice.exceptions.ErrorInputData;
@@ -20,7 +21,7 @@ public class TransferServer {
 
     private final TransferLog transferLog;
 
-    public OperationId transfer(Transfer transfer) {
+    public ResponseEntity<?> transfer(Transfer transfer) {
         transferLog.transferLog(transfer);
         if (transfer.cardFromNumber().startsWith("4")) {
             throw new ErrorInputData(
@@ -29,17 +30,18 @@ public class TransferServer {
         if (transfer.amount().value() > 100000) {
             throw new ErrorTransfer("value is so big (biggest then 1000)", transferLog);
         }
-        return transferRepository.getOperationId(transfer);
+        OperationId iDFromRep = transferRepository.getOperationId(transfer);
+        return new ResponseEntity<>(iDFromRep, HttpStatus.OK);
     }
 
-    public OperationId confirmOperation(ConfirmOperation confirmOperation) {
+    public ResponseEntity<?> confirmOperation(ConfirmOperation confirmOperation) {
         if (confirmOperation.code() == null || confirmOperation.code().length() > 4) {
             throw new ErrorInputData("code not received", transferLog);
         }
         OperationId confirmId = transferRepository.confirmOperation(confirmOperation);
         if (!confirmId.operationId().equals("denied")) {
             transferLog.transferResultLog(confirmOperation);
-            return confirmId;
+            return new ResponseEntity<>(confirmId, HttpStatus.OK);
         } else {
             throw new ErrorConfirmation("The transaction has not been approved", transferLog);
         }

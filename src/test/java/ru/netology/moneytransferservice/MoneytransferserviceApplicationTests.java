@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.ResponseEntity;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -67,7 +68,7 @@ class MoneytransferserviceApplicationTests {
 
     @Test
     void transferControllerTest() {
-        OperationId testID = transferController.transfer(transferTest);
+        ResponseEntity<String> testID = transferController.transfer(transferTest);
         // then:
         Assertions.assertNotNull(testID);
     }
