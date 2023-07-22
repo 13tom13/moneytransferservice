@@ -1,6 +1,5 @@
 package ru.netology.moneytransferservice.logger;
 
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.netology.moneytransferservice.model.ConfirmOperation;
@@ -17,42 +16,34 @@ public class TransferLog {
     @Value("${log.file.name}")
     private String filename;
 
-    public void transferLog(Transfer transfer) {
+    private final String transferTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss"));
+
+    private synchronized void logEntry(String log) {
         try (FileWriter writer = new FileWriter(filename, true)) {
-            double value = (double) transfer.amount().value() / 100;
-            double commission = value / 100;
-            String transferTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss"));
-            String transferForWrite =
-                    String.format("[TRANSFER] %s | from card: %s | to card: %s | value: %.2f | commission: %.2f\n",
-                            transferTime, transfer.cardFromNumber(), transfer.cardToNumber(), value, commission);
-            writer.write(transferForWrite);
+            writer.write(log);
             writer.flush();
-            System.out.print(transferForWrite);
+            System.out.print(log);
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+
+    public void transferLog(Transfer transfer) {
+        double value = (double) transfer.amount().value() / 100;
+        double commission = value / 100;
+        String transferForWrite =
+                String.format("[TRANSFER] %s | from card: %s | to card: %s | value: %.2f | commission: %.2f\n",
+                        transferTime, transfer.cardFromNumber(), transfer.cardToNumber(), value, commission);
+        logEntry(transferForWrite);
     }
 
     public void errorLog(String msg) {
-        try (FileWriter writer = new FileWriter(filename, true)) {
-            String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss"));
-            String error = String.format("[ERROR] %s | message: %s\n", time, msg);
-            writer.write(error);
-            System.out.print(error);
-            writer.flush();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
+        String error = String.format("[ERROR] %s | message: %s\n", transferTime, msg);
+        logEntry(error);
     }
 
-    public void transferResultLog(ConfirmOperation confirmOperation) {
-        try (FileWriter writer = new FileWriter(filename, true)) {
-            String result = String.format("[RESULT] success | (OperationID: %s)\n", confirmOperation.operationId());
-            writer.write(result);
-            System.out.print(result);
-            writer.flush();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
+    public synchronized void transferResultLog(ConfirmOperation confirmOperation) {
+        String result = String.format("[RESULT] %s | success | (OperationID: %s)\n", transferTime, confirmOperation.operationId());
+        logEntry(result);
     }
 }
