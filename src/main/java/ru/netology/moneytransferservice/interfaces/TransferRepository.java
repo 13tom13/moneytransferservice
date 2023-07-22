@@ -9,4 +9,5 @@ public interface TransferRepository {
     OperationId getOperationId(TransferData transfer);
 
     OperationId confirmOperation(ConfirmData confirmOperation);
+
 }

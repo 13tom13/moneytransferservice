@@ -1,7 +1,7 @@
 package ru.netology.moneytransferservice.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.netology.moneytransferservice.interfaces.TransferRepository;
 import ru.netology.moneytransferservice.model.ConfirmData;
 import ru.netology.moneytransferservice.model.OperationId;
@@ -10,18 +10,19 @@ import ru.netology.moneytransferservice.model.TransferData;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class MoneyTransferRepository implements TransferRepository {
 
     private final ConcurrentHashMap<String, String> repository = new ConcurrentHashMap<>();
 
+    private static final String CODE_STUB = "0000";
+
     @Override
     public OperationId getOperationId(TransferData transferData) {
         String operationId = String.valueOf(UUID.nameUUIDFromBytes(transferData.toString().getBytes()));
         OperationId iDFromRep = new OperationId(operationId);
-        String code = "0000"; //code stub
-        repository.put(operationId, code);
+        repository.put(operationId, CODE_STUB);
         return iDFromRep;
     }
 
@@ -35,6 +36,5 @@ public class MoneyTransferRepository implements TransferRepository {
             return new OperationId("denied");
         }
     }
-
 
 }
