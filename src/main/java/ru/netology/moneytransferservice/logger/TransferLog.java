@@ -1,8 +1,10 @@
-package ru.netology.moneytransferservice.model;
+package ru.netology.moneytransferservice.logger;
 
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.netology.moneytransferservice.model.ConfirmOperation;
+import ru.netology.moneytransferservice.model.Transfer;
 
 import java.io.FileWriter;
 import java.io.IOException;

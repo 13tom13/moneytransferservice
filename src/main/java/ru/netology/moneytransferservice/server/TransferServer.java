@@ -10,7 +10,7 @@ import ru.netology.moneytransferservice.exceptions.ErrorTransfer;
 import ru.netology.moneytransferservice.model.ConfirmOperation;
 import ru.netology.moneytransferservice.model.OperationId;
 import ru.netology.moneytransferservice.model.Transfer;
-import ru.netology.moneytransferservice.model.TransferLog;
+import ru.netology.moneytransferservice.logger.TransferLog;
 import ru.netology.moneytransferservice.repository.TransferRepository;
 
 @Service

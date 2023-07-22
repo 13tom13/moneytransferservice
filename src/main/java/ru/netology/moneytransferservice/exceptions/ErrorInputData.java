@@ -1,6 +1,6 @@
 package ru.netology.moneytransferservice.exceptions;
 
-import ru.netology.moneytransferservice.model.TransferLog;
+import ru.netology.moneytransferservice.logger.TransferLog;
 
 public class ErrorInputData extends ErrorLog {
     public ErrorInputData(String msg, TransferLog log) {
