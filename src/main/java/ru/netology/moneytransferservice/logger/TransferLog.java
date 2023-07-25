@@ -28,22 +28,25 @@ public class TransferLog {
         }
     }
 
-    public void transferLog(TransferData transfer) {
+    public String transferLog(TransferData transfer) {
         double value = (double) transfer.amount().value() / 100;
         double commission = value / 100;
         String transferForWrite =
                 String.format("[TRANSFER] %s | from card: %s | to card: %s | value: %.2f | commission: %.2f\n",
                         transferTime, transfer.cardFromNumber(), transfer.cardToNumber(), value, commission);
         logEntry(transferForWrite);
+        return transferForWrite;
     }
 
-    public void errorLog(String msg) {
+    public String errorLog(String msg) {
         String error = String.format("[ERROR] %s | message: %s\n", transferTime, msg);
         logEntry(error);
+        return error;
     }
 
-    public synchronized void transferResultLog(ConfirmData confirmOperation) {
-        String result = String.format("[RESULT] %s | success | (OperationID: %s)\n", transferTime, confirmOperation.operationId());
-        logEntry(result);
+    public String transferResultLog(ConfirmData confirmOperation) {
+        String transferResult = String.format("[RESULT] %s | success | (OperationID: %s)\n", transferTime, confirmOperation.operationId());
+        logEntry(transferResult);
+        return transferResult;
     }
 }

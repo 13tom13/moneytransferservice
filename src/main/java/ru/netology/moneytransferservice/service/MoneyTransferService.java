@@ -7,21 +7,20 @@ import org.springframework.stereotype.Service;
 import ru.netology.moneytransferservice.exceptions.ErrorConfirmation;
 import ru.netology.moneytransferservice.exceptions.ErrorInputData;
 import ru.netology.moneytransferservice.exceptions.ErrorTransfer;
+import ru.netology.moneytransferservice.interfaces.TransferRepository;
 import ru.netology.moneytransferservice.interfaces.TransferService;
+import ru.netology.moneytransferservice.logger.TransferLog;
 import ru.netology.moneytransferservice.model.ConfirmData;
 import ru.netology.moneytransferservice.model.OperationId;
 import ru.netology.moneytransferservice.model.TransferData;
-import ru.netology.moneytransferservice.logger.TransferLog;
-import ru.netology.moneytransferservice.repository.MoneyTransferRepository;
 
 @Service
 @RequiredArgsConstructor
 public class MoneyTransferService implements TransferService {
 
-    private final MoneyTransferRepository transferRepository;
+    private final TransferRepository transferRepository;
 
     private final TransferLog transferLog;
-
 
     @Override
     public ResponseEntity<?> transfer(TransferData transferData) {

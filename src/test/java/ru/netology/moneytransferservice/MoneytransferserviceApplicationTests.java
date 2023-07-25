@@ -6,51 +6,144 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.netology.moneytransferservice.controller.MoneyTransferController;
 import ru.netology.moneytransferservice.exceptions.ErrorConfirmation;
+import ru.netology.moneytransferservice.interfaces.TransferController;
+import ru.netology.moneytransferservice.interfaces.TransferRepository;
+import ru.netology.moneytransferservice.interfaces.TransferService;
+import ru.netology.moneytransferservice.logger.TransferLog;
 import ru.netology.moneytransferservice.model.Amount;
 import ru.netology.moneytransferservice.model.ConfirmData;
 import ru.netology.moneytransferservice.model.OperationId;
 import ru.netology.moneytransferservice.model.TransferData;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MoneytransferserviceApplicationTests {
 
     @Autowired
-    private MoneyTransferController transferControllerImpl;
+    private TransferController transferController;
 
     @Autowired
-    TestRestTemplate restTemplate;
+    private TransferService transferService;
 
-    static TransferData transferTest;
+    @Autowired
+    private TransferRepository transferRepository;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private TransferLog transferLog;
+
+    private static TransferData transferDataTest;
+
+    private static ConfirmData confirmDataTest;
 
     @Container
     private static final GenericContainer<?> moneytransferservice = new GenericContainer<>("moneytransferservice:latest")
             .withExposedPorts(5500);
 
+
     @BeforeEach
     public void setUp() {
-        transferTest = Mockito.mock(TransferData.class);
+        //Mock for TransferData
+        transferDataTest = Mockito.mock(TransferData.class);
         Amount amountTest = Mockito.mock(Amount.class);
         Mockito.when(amountTest.value()).thenReturn(100);
         Mockito.when(amountTest.currency()).thenReturn("RUR");
-        Mockito.when(transferTest.amount()).thenReturn(amountTest);
-        Mockito.when(transferTest.cardFromNumber()).thenReturn("0000000000000000");
-        Mockito.when(transferTest.cardToNumber()).thenReturn("1000000000000000");
-        Mockito.when(transferTest.cardFromCVV()).thenReturn("123");
-        Mockito.when(transferTest.cardFromValidTill()).thenReturn("1234");
+        Mockito.when(transferDataTest.amount()).thenReturn(amountTest);
+        Mockito.when(transferDataTest.cardFromNumber()).thenReturn("test000000000000");
+        Mockito.when(transferDataTest.cardToNumber()).thenReturn("test000000000000");
+        Mockito.when(transferDataTest.cardFromCVV()).thenReturn("123");
+        Mockito.when(transferDataTest.cardFromValidTill()).thenReturn("1234");
+
+        //Mock for ConfirmData
+        confirmDataTest = Mockito.mock(ConfirmData.class);
+        Mockito.when(confirmDataTest.code()).thenReturn("0000");
+        Mockito.when(confirmDataTest.operationId()).thenReturn("test");
     }
 
     @AfterEach
     public void setDown() {
-        transferTest = null;
+        transferDataTest = null;
+        confirmDataTest = null;
+    }
+
+    @Test
+    void transferIntegrationTest() {
+        // when:
+        ResponseEntity<?> testEntity = transferController.transfer(transferDataTest);
+        OperationId testId = new OperationId("test");
+        // then:
+        Assertions.assertEquals(testEntity.getBody().getClass(), testId.getClass());
+    }
+
+    @Test
+    void confirmOperationIntegrationTest() {
+        // when:
+        ErrorConfirmation testConfirmationException = Assertions.assertThrows(ErrorConfirmation.class,
+                () -> transferController.confirmOperation(confirmDataTest));
+        // then:
+        Assertions.assertEquals("The transaction has not been approved",
+                testConfirmationException.getMessage());
+    }
+
+    @Test
+    void transferServiceTest() {
+        // given:
+        OperationId testId = new OperationId(String.valueOf(UUID.nameUUIDFromBytes(transferDataTest.toString().getBytes())));
+        Mockito.when(confirmDataTest.operationId()).thenReturn(testId.operationId());
+        // when:
+        OperationId idFromTransferService = (OperationId) transferService.transfer(transferDataTest).getBody();
+        OperationId idFromConfirmService = (OperationId) transferService.confirmOperation(confirmDataTest).getBody();
+        // then:
+        Assertions.assertEquals(testId.operationId(), idFromTransferService.operationId());
+        Assertions.assertEquals(idFromTransferService.operationId(), idFromConfirmService.operationId());
+    }
+
+    @Test
+    void transferRepositoryTest() {
+        // given:
+        OperationId testId = new OperationId(String.valueOf(UUID.nameUUIDFromBytes(transferDataTest.toString().getBytes())));
+        Mockito.when(confirmDataTest.operationId()).thenReturn(testId.operationId());
+        // when:
+        OperationId idFromRep = transferRepository.getOperationId(transferDataTest);
+        OperationId confirmId = transferRepository.confirmOperation(confirmDataTest);
+        // then:
+        Assertions.assertEquals(testId, idFromRep);
+        Assertions.assertEquals(idFromRep, confirmId);
+    }
+
+    @Test
+    void loggerTest(@Value("${log.file.name}") String logFile) throws IOException {
+        // given:
+        String testErrorMesseg = "testError";
+        Path pathLog = Paths.get(logFile);
+        //when:
+        String testError = transferLog.errorLog(testErrorMesseg);
+        String testTranserLog = transferLog.transferLog(transferDataTest);
+        String testResultLog = transferLog.transferResultLog(confirmDataTest);
+        //then:
+        boolean checkError = Files.lines(pathLog).anyMatch(testError::contains);
+        boolean checkTranserLog = Files.lines(pathLog).anyMatch(testTranserLog::contains);
+        boolean checkResultLog = Files.lines(pathLog).anyMatch(testResultLog::contains);
+
+        Assertions.assertTrue(checkError);
+        Assertions.assertTrue(checkTranserLog);
+        Assertions.assertTrue(checkResultLog);
     }
 
     @Test
@@ -59,35 +152,14 @@ class MoneytransferserviceApplicationTests {
         moneytransferservice.start();
         Integer port = moneytransferservice.getMappedPort(5500);
         // when:
-        OperationId operationId = restTemplate.postForObject
-                ("http://localhost:" + port + "/transfer", transferTest, OperationId.class);
+        OperationId operationIdFromTransfer = restTemplate.postForObject
+                ("http://localhost:" + port + "/transfer", transferDataTest, OperationId.class);
+        Mockito.when(confirmDataTest.operationId()).thenReturn(operationIdFromTransfer.operationId());
+
+        OperationId operationIdFromConfirmOperation = restTemplate.postForObject
+                ("http://localhost:" + port + "/confirmOperation", confirmDataTest, OperationId.class);
         // then:
-        Assertions.assertNotNull(operationId.operationId());
+        Assertions.assertEquals(operationIdFromTransfer, operationIdFromConfirmOperation);
     }
-
-
-    @Test
-    void transferControllerTest() {
-        ResponseEntity<String> testID = transferControllerImpl.transfer(transferTest);
-        // then:
-        Assertions.assertNotNull(testID);
-    }
-
-    @Test
-    void confirmOperationTest() {
-        // given:
-        String testIDRequest = "1234";
-        String testCode = "0000";
-        ConfirmData confirmOperation = Mockito.mock(ConfirmData.class);
-        Mockito.when(confirmOperation.code()).thenReturn(testCode);
-        Mockito.when(confirmOperation.operationId()).thenReturn(testIDRequest);
-        // when:
-        ErrorConfirmation testConfirmationException = Assertions.assertThrows(ErrorConfirmation.class,
-                () -> transferControllerImpl.confirmOperation(confirmOperation));
-        // then:
-        Assertions.assertEquals("The transaction has not been approved",
-                testConfirmationException.getMessage());
-    }
-
 
 }
