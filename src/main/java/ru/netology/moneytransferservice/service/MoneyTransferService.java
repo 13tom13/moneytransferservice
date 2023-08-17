@@ -41,11 +41,9 @@ public class MoneyTransferService implements TransferService {
             throw new ErrorInputData("code not received", transferLog);
         }
         OperationId confirmId = transferRepository.confirmOperation(confirmData);
-        if (!confirmId.operationId().equals("denied")) {
+        if (confirmId.operationId().equals("denied"))
+            throw new ErrorConfirmation("The transaction has not been approved", transferLog);
             transferLog.transferResultLog(confirmData);
             return new ResponseEntity<>(confirmId, HttpStatus.OK);
-        } else {
-            throw new ErrorConfirmation("The transaction has not been approved", transferLog);
-        }
     }
 }
