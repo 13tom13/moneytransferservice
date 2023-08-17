@@ -23,7 +23,7 @@ public class MoneyTransferService implements TransferService {
     private final TransferLog transferLog;
 
     @Override
-    public ResponseEntity<?> transfer(TransferData transferData) {
+    public ResponseEntity<OperationId> transfer(TransferData transferData) {
         transferLog.transferLog(transferData);
         if (transferData.cardFromNumber().startsWith("4")) {
             throw new ErrorInputData(
@@ -37,7 +37,7 @@ public class MoneyTransferService implements TransferService {
     }
 
     @Override
-    public ResponseEntity<?> confirmOperation(ConfirmData confirmData) {
+    public ResponseEntity<OperationId> confirmOperation(ConfirmData confirmData) {
         if (confirmData.code() == null || confirmData.code().length() > 4) {
             throw new ErrorInputData("code not received", transferLog);
         }

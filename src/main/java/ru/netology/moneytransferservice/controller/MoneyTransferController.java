@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.netology.moneytransferservice.interfaces.TransferController;
 import ru.netology.moneytransferservice.interfaces.TransferService;
 import ru.netology.moneytransferservice.model.ConfirmData;
+import ru.netology.moneytransferservice.model.OperationId;
 import ru.netology.moneytransferservice.model.TransferData;
 
 import javax.validation.Valid;
@@ -23,13 +24,13 @@ public class MoneyTransferController implements TransferController {
 
     @Override
     @PostMapping("/transfer")
-    public ResponseEntity<?> transfer(@RequestBody @Valid TransferData transferData) {
+    public ResponseEntity<OperationId> transfer(@RequestBody @Valid TransferData transferData) {
         return transferServer.transfer(transferData);
     }
 
     @Override
     @PostMapping("/confirmOperation")
-    public ResponseEntity<?> confirmOperation(@RequestBody @Valid ConfirmData confirmData) {
+    public ResponseEntity<OperationId> confirmOperation(@RequestBody @Valid ConfirmData confirmData) {
         return transferServer.confirmOperation(confirmData);
     }
 }
