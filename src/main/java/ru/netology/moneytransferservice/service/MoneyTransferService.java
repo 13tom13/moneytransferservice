@@ -24,9 +24,9 @@ public class MoneyTransferService implements TransferService {
     @Override
     public ResponseEntity<OperationId> transfer(TransferData transferData) {
         transferLog.transferLog(transferData);
-        if (transferData.cardFromNumber().startsWith("4")) {
+        if (transferData.cardFromNumber() == null) {
             throw new ErrorInputData(
-                    "i'm don't like this card number: " + transferData.cardFromNumber() + " starts with \"4\"", transferLog);
+                    "debit card number not found", transferLog);
         }
         if (transferData.amount().value() > 100000) {
             throw new ErrorTransfer("value is so big (biggest then 1000)", transferLog);
@@ -37,7 +37,7 @@ public class MoneyTransferService implements TransferService {
 
     @Override
     public ResponseEntity<OperationId> confirmOperation(ConfirmData confirmData) {
-        if (confirmData.code() == null || confirmData.code().length() > 4) {
+        if (confirmData.code() == null) {
             throw new ErrorInputData("code not received", transferLog);
         }
         OperationId confirmId = transferRepository.confirmOperation(confirmData);
