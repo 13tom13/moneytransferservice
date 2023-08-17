@@ -13,15 +13,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class MoneyTransferRepository implements TransferRepository {
 
-    private final ConcurrentHashMap<String, String> repository = new ConcurrentHashMap<>();
-
     private static final String CODE_STUB = "0000";
+
+    private final ConcurrentHashMap<String, String> repository = new ConcurrentHashMap<>();
 
     @Override
     public OperationId getOperationId(TransferData transferData) {
         String operationId = String.valueOf(UUID.nameUUIDFromBytes(transferData.toString().getBytes()));
         OperationId iDFromRep = new OperationId(operationId);
-        repository.put(operationId, CODE_STUB);
+        repository.putIfAbsent(operationId, CODE_STUB);
         return iDFromRep;
     }
 
@@ -29,11 +29,8 @@ public class MoneyTransferRepository implements TransferRepository {
     public OperationId confirmOperation(ConfirmData confirmData) {
         String iDForConfirm = confirmData.operationId();
         String codeFromRep = repository.remove(iDForConfirm);
-        if (confirmData.code().equals(codeFromRep)) {
-            return new OperationId(iDForConfirm);
-        } else {
-            return new OperationId("denied");
-        }
+        return confirmData.code().equals(codeFromRep) ?
+                new OperationId(iDForConfirm) : new OperationId("denied");
     }
 
 }
