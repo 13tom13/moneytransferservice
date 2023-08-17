@@ -4,9 +4,9 @@ import ru.netology.moneytransferservice.logger.TransferLog;
 
 import java.util.Random;
 
-public abstract class Error extends RuntimeException {
+public abstract class ApplicationTransferException extends RuntimeException {
 
-    public Error(String msg, TransferLog log) {
+    public ApplicationTransferException(String msg, TransferLog log) {
         super(msg);
         log.errorLog(msg);
     }
