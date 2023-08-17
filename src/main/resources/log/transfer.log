@@ -1,1 +1,4 @@
 
+[TRANSFER] 17-08-2023 16:56:01 | from card: test000000000000 | to card: test000000000000 | value: 1,00 | commission: 0,01
+[TRANSFER] 17-08-2023 16:57:33 | from card: test000000000000 | to card: test000000000000 | value: 1,00 | commission: 0,01
+[RESULT] 17-08-2023 16:57:33 | success | (OperationID: 69d89f42-4a10-306a-9448-3b7eee5d223c)

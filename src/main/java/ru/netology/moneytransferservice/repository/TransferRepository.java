@@ -1,4 +1,4 @@
-package ru.netology.moneytransferservice.interfaces;
+package ru.netology.moneytransferservice.repository;
 
 import ru.netology.moneytransferservice.model.ConfirmData;
 import ru.netology.moneytransferservice.model.OperationId;

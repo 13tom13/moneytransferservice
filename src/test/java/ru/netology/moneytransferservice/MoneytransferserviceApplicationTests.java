@@ -14,9 +14,9 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.netology.moneytransferservice.exceptions.ErrorConfirmation;
-import ru.netology.moneytransferservice.interfaces.TransferController;
-import ru.netology.moneytransferservice.interfaces.TransferRepository;
-import ru.netology.moneytransferservice.interfaces.TransferService;
+import ru.netology.moneytransferservice.controller.TransferController;
+import ru.netology.moneytransferservice.repository.TransferRepository;
+import ru.netology.moneytransferservice.service.TransferService;
 import ru.netology.moneytransferservice.logger.TransferLog;
 import ru.netology.moneytransferservice.model.Amount;
 import ru.netology.moneytransferservice.model.ConfirmData;
@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.UUID;
 
 @Testcontainers
@@ -85,10 +86,11 @@ class MoneytransferserviceApplicationTests {
     @Test
     void transferIntegrationTest() {
         // when:
-        ResponseEntity<?> testEntity = transferController.transfer(transferDataTest);
-        OperationId testId = new OperationId("test");
+        ResponseEntity<OperationId> testEntity = transferController.transfer(transferDataTest);
+        String operationId = String.valueOf(UUID.nameUUIDFromBytes(transferDataTest.toString().getBytes()));
+        OperationId testId = new OperationId(operationId);
         // then:
-        Assertions.assertEquals(testEntity.getBody().getClass(), testId.getClass());
+        Assertions.assertEquals(testEntity.getBody(), testId);
     }
 
     @Test
@@ -107,11 +109,11 @@ class MoneytransferserviceApplicationTests {
         OperationId testId = new OperationId(String.valueOf(UUID.nameUUIDFromBytes(transferDataTest.toString().getBytes())));
         Mockito.when(confirmDataTest.operationId()).thenReturn(testId.operationId());
         // when:
-        OperationId idFromTransferService = (OperationId) transferService.transfer(transferDataTest).getBody();
-        OperationId idFromConfirmService = (OperationId) transferService.confirmOperation(confirmDataTest).getBody();
+        OperationId idFromTransferService = transferService.transfer(transferDataTest).getBody();
+        OperationId idFromConfirmService = transferService.confirmOperation(confirmDataTest).getBody();
         // then:
-        Assertions.assertEquals(testId.operationId(), idFromTransferService.operationId());
-        Assertions.assertEquals(idFromTransferService.operationId(), idFromConfirmService.operationId());
+        Assertions.assertEquals(testId.operationId(), Objects.requireNonNull(idFromTransferService).operationId());
+        Assertions.assertEquals(idFromTransferService.operationId(), Objects.requireNonNull(idFromConfirmService).operationId());
     }
 
     @Test
