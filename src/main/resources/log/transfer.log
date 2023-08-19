@@ -1,0 +1,7 @@
+[TRANSFER] 19-08-2023 12:51:21 | from card: test000000000000 | to card: test000000000000 | value: 1,00 | commission: 0,01
+[TRANSFER] 19-08-2023 12:51:21 | from card: test000000000000 | to card: test000000000000 | value: 1,00 | commission: 0,01
+[RESULT] 19-08-2023 12:51:21 | success | (OperationID: 6744572b-20a3-3739-bfa4-1dd2682198e2)
+[ERROR] 19-08-2023 12:51:21 | message: testError
+[TRANSFER] 19-08-2023 12:51:21 | from card: test000000000000 | to card: test000000000000 | value: 1,00 | commission: 0,01
+[RESULT] 19-08-2023 12:51:21 | success | (OperationID: test)
+[ERROR] 19-08-2023 12:51:21 | message: The transaction has not been approved
